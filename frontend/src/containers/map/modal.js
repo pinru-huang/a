@@ -1,7 +1,8 @@
 import "../css/modal.scss"
 import { useEffect,useState, useRef } from "react"
 import Pictures from "./switchPictures"
-function Modal({open, scroll, setScroll, data, calculateRoute, time_dis, setOpenParking}){
+import { useNavigate, useLocation } from 'react-router-dom'
+function Modal({open, scroll, setScroll, data, calculateRoute, time_dis, setOpenParking, mode}){
     // const [openParking, setOpenParking] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     // console.log("t: ", time_dis.dur)
@@ -49,13 +50,11 @@ function Modal({open, scroll, setScroll, data, calculateRoute, time_dis, setOpen
         setScroll(false)
         // body.style.overflow = "initial";
       };
-    // window.addEventListener("scroll", () => {
-    //     if (window.scrollY > window.innerHeight / 3 && !isOpened) {
-    //       isOpened = true;
-    //       scrollDownRef.current.style.display = "none";
-    //       openModal();
-    //     }
-    //   });
+      const navigate = useNavigate();
+      const navigateToMap = () => {
+          // TODO Part III-1: navigate the user to restaurant page with the corresponding id
+          if(mode===2) navigate('/Map')
+      }
     if(!open) {
       return <></>
     }
@@ -85,7 +84,7 @@ function Modal({open, scroll, setScroll, data, calculateRoute, time_dis, setOpen
       <div className="modal-buttons">
         {/* <a href="" className="">Forgot your password?</a> */}
         <button className="input-button" style={{marginLeft: "auto", marginRight: "auto"}} onClick={()=>{setOpenParking(true); setScroll(false);}}>Park In</button>
-        <button className="input-button" style={{marginLeft: "auto", marginRight: "auto"}} onClick={()=>{calculateRoute(0); setScroll(false)}}>navigate</button>
+        <button className="input-button" style={{marginLeft: "auto", marginRight: "auto"}} onClick={()=>{calculateRoute(0); setScroll(false); navigateToMap()}}>navigate</button>
       </div>
       {/* <p className="sign-up">Don't have an account? <a href="#">Sign up now</a></p> */}
     </div>

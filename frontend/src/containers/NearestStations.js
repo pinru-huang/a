@@ -14,7 +14,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { m } from 'framer-motion';
 import Modal from '../containers/map/modal';
 import { Form, redirect, useOutletContext } from 'react-router-dom';
-
+import { useApp } from "../hook";
 const stations = [
     {label: '1st Student Activity Center 第一學生活動中心', dist: 200},
     {label: 'Astronomy Mathematics Building 天文數學館', dist: 1500},
@@ -58,7 +58,7 @@ const NearestStations = () => {
   const [selected, setSelected] = useState(0);
   const [openParking, setOpenParking] = useState(false)
   const [position, setPosition] = useState({lat: null, lng: null, time: null})
-
+  const {defaultLocation,setDefaultLocation}=useApp();
   React.useEffect(() => {
     navigator.geolocation.getCurrentPosition((position)=> {
         setPosition({lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
@@ -71,8 +71,8 @@ const NearestStations = () => {
     const {
       data: { stations },
     } = await axios.get('/stations');
-    console.log("Handle get all stations")
-    console.log(stations)
+    // console.log("Handle get all stations")
+    // console.log(stations)
     const stationsSorted = stations.sort((a, b) => calcDist(position, a.location) - calcDist(position, b.location));
     setAllStations(stationsSorted)
   }
@@ -83,8 +83,9 @@ const NearestStations = () => {
   }
 
   var time_dis = {dur: 0, dis: 0}
-  const calculateRoute = () => {
-
+  const calculateRoute = (idx) => {
+    console.log("hihi: ", idx, allStations[idx].label)
+    setDefaultLocation(allStations[idx].location)
   }
 
   const [allStations, setAllStations] = useState([]);
@@ -128,7 +129,7 @@ const NearestStations = () => {
                 />
             </ListItem>
             <Divider variant="inset" component="li" key= {`${stop.label} divider`} />
-            <Modal open={true} scroll={scroll2} setScroll={setScroll2} data={allStations[selected]} calculateRoute={()=>calculateRoute()} time_dis={time_dis} setOpenParking={setOpenParking}></Modal>
+            <Modal open={true} scroll={scroll2} setScroll={setScroll2} data={allStations[selected]} calculateRoute={()=>calculateRoute(selected)} time_dis={time_dis} setOpenParking={setOpenParking} mode={2}></Modal>
                     </>
              )}
       {/* <ListItem alignItems="flex-start" sx={{height: '80px'}}>

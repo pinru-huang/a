@@ -17,6 +17,7 @@ import ParkInModal from "./ParkInModal"
 import axios from '../../connection';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useOutletContext } from 'react-router-dom';
+import { useApp } from "../../hook";
 const center = { lat: 48.8584, lng: 2.2945 }
 
 
@@ -44,6 +45,7 @@ function Map () {
     const [mapStyle, setMapStyle] = useState([null, mapStyle_1, mapStyle_2])
     const [countStyle, setCountStyle]= useState(0)
     const [username] = useOutletContext();
+    const {defaultLocation,setDefaultLocation}=useApp();
     // const [stationDist, setStationDist] = useState([])
     var stationsDist=[]
         /** @type React.MutableRefObject<HTMLInputElement> */
@@ -72,19 +74,20 @@ function Map () {
     useEffect(()=>{
         navigator.geolocation.getCurrentPosition((position)=> {
             setSelected({lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
+            originRef.current = {lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()}
             getStations()
-            console.log("selected", {lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
+            // console.log("selected", {lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
         })
     }, [])
        
     useEffect(()=> {
       if(stations.length!==0){
        for(let i=0; i<stations.length; i++){
-          console.log(stations[i].location.lat, selected.lat, stations[i].location.lng)
+          // console.log(stations[i].location.lat, selected.lat, stations[i].location.lng)
           let dis = Math.sqrt((stations[i].location.lat-selected.lat)*111.2*111.2*(stations[i].location.lat-selected.lat) + (stations[i].location.lng-selected.lng)*110.8*110.8*(stations[i].location.lng-selected.lng))
           stationsDist.push({dist: dis*1000, label: stations[i].label})
           // saveDist(dis, stations[i].label)
-          console.log(stationsDist);
+          // console.log(stationsDist);
           // console.log('gugo ')
         // distData.push(getTime_Dis(stations[i].location))
         }
@@ -93,6 +96,10 @@ function Map () {
     
       // console.log("disData", distData)
     }, [stations])
+
+    useEffect(()=>{
+      if(defaultLocation.lat!==null||selected!==null) {calculateRoute(defaultLocation); console.log("ffffffuck: ", defaultLocation)}
+    },[defaultLocation, selected])
 
     const saveDist = async() => {
       await axios.post("/stations/distance", {
@@ -133,6 +140,7 @@ function Map () {
         /*顯示出路徑 */
     async function calculateRoute(destination) {
         if(destination===undefined) return
+        if(!destination) return 
         console.log("des: ", destination, 'd', originRef.current, destinationRef.current)
         const origin = originRef==='' ? selected : originRef;
         // // console.log("val: ", origin,destinationRef.current.value)
@@ -151,6 +159,7 @@ function Map () {
         }) 
         // if(mode===1) return {dis: results.routes[0].legs[0].distance.text, dur: results.routes[0].legs[0].duration.text}
         setDirectionsResponse(results)
+        setDefaultLocation({lat: null, lng: null})
         setDistance(results.routes[0].legs[0].distance.text)
         setDuration(results.routes[0].legs[0].duration.text)
     }

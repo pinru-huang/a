@@ -1,4 +1,4 @@
-import StationsData from '../stations.json' assert {type: "json"}
+import StationsData from '../stations.json' //assert {type: "json"}
 import Station from './models/station.js'
 import MyBike from "./models/myBike.js"
 

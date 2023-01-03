@@ -22,6 +22,7 @@ const AppProvider=(props)=>{
     const [me,setMe]=useState({})
     const [flag,setFlag]=useState(true);
     const [flag2,setFlag2]=useState(true);
+    const [defaultLocation, setDefaultLocation] = useState({lat: null, lng: null})
     useEffect(()=>{
         const gg=async()=>{
             console.log("lb "+loginBefore);
@@ -133,7 +134,7 @@ const AppProvider=(props)=>{
     
     return(
         <AppContext.Provider
-            value={{status,setStatus,err,setErr,me,setMe}}
+            value={{status,setStatus,err,setErr,me,setMe,defaultLocation,setDefaultLocation}}
             {...props}
         />
     );
