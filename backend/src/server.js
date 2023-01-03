@@ -67,8 +67,9 @@ app.listen(port, () =>
 const db = mongoose.connection;
 db.on("error", (err) => console.log(err));
 db.once("open", async () => {
-    dataInit();
+  
   await deleteDB();
+  dataInit();
 //  for(let i=0; i<stations.length; i++){
 //     await saveStation(stations[i].label, stations[i].dist, stations[i].density, stations[i].location.lat, stations[i].location.lng);
 //  }
