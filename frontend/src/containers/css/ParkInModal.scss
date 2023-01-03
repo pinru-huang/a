@@ -1,0 +1,187 @@
+* {
+    box-sizing:border-box;
+  }
+  
+  html,body {
+    min-height:100%;
+    height:100%;
+    background-image:url(https://www.wallpapertip.com/wmimgs/69-691636_best-background-images-for-website-wallpapers-high-good.jpg);
+    background-size:cover;
+    background-position:top center;
+    font-family:helvetica neue, helvetica, arial, sans-serif;
+    font-weight:200;
+    &.modal-active {
+      overflow: hidden;
+    }
+  }
+  
+  h1 {
+      text-align: center;
+      font-family: "Trebuchet MS", Tahoma, Arial, sans-serif;
+      color: #333;
+      text-shadow: 0 1px 0 #fff;
+      margin: 50px 0;
+  }
+  
+  #wrapper {
+      width: 100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border: 10px solid #aaa;
+      border-radius: 15px;
+      background-clip: padding-box;
+      text-align: center;
+  }
+  
+//   .button {
+//       font-family: Helvetica, Arial, sans-serif;
+//       font-size: 13px;
+//       padding: 5px 10px;
+//       border: 1px solid #aaa;
+//       background-color: #eee;
+//       background-image: linear-gradient(top, #fff, #f0f0f0);
+//       border-radius: 2px;
+//       box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+//       color: #666;
+//       text-decoration: none;
+//       text-shadow: 0 1px 0 #fff;
+//       cursor: pointer;
+//       transition: all 0.2s ease-out;
+//     &:hover {
+//       border-color: #999;
+//       box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+//     }
+//     &:active {
+//       box-shadow: 0 1px 3px rgba(0,0,0,0.25) inset;
+//     }
+//   }
+
+
+  @mixin box($w, $h: $w, $bg: none) {
+    width: $w;
+    height: $h;
+    background: $bg;
+    
+    @content;
+  }
+  
+  %_center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  
+//   * {
+//     outline: none;
+//     box-sizing: border-box;
+//   }
+  
+  
+  .demo {
+    @extend %_center;
+    @include box(100vw, 100vh, #FAFAFC) {
+    //   padding: 35px;
+      color: #444;
+    }
+  }
+  
+  
+  .parkInModal {
+    @include box(80vw, 350px, none) {
+      max-width: 300px;
+      border-radius: 10px;
+      background-image: linear-gradient(to top right, #5560ee, #b3b7f0);
+      box-shadow: 2px 2px 15px -2px rgba(0, 0, 0, .34), -2px -2px 10px -5px rgba(0, 0, 0, .2);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400;
+    //   flex-direction: column;    
+    //   display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    //   padding: 10px;
+    };
+    
+  
+    // .close {
+    //   position: absolute;
+    //   top: 20px;
+    //   right: 20px;
+    //   color: white;
+    //   opacity: .9;
+    //   font-size: 35px;
+    // }
+    
+    .texts {
+    //   margin-top: 20px;
+      text-align: center;
+      
+      p {
+        font-weight: lighter;
+        font-size: 1.1em;
+      }
+
+      h3 {
+        color: rgb(67, 23, 121);
+      }
+    }
+    
+    .form {
+    //   margin-top: 10px;
+    //   margin-bottom: 100px;
+      
+      input {
+        padding: 20px 25px;
+        border-radius: 30px;
+        font-size: 1.1em;
+        border: none;
+        width: 150px;
+      }
+      
+      button {
+        margin-top: 10px;
+        // padding: 15px;
+        height: 60px;
+        border-radius: 20%;
+        background: #5560ee;
+        color: white;
+        border: none;
+        font-size: 25px;
+        margin-left: 15px;
+        cursor: pointer;
+        // transition: background .15s ease-in-out;
+        
+        &:hover {
+          background: darken(#5560ee, 5%)
+        }
+        h3 {
+            color: rgb(67, 23, 121);
+        }
+      }
+    }
+  }
+
+  .bike {
+    // text-align: center;
+    width: 35px;
+    border: 2px;
+    background-color:#9da3f0;
+    border-radius: 50%;
+    &:hover {
+        background: darken(#5560ee, 5%)
+      }
+    &.bikeClicked {
+        background: darken(#5560ee, 5%)
+    }
+  }
+
+  .bikes {
+    text-align: center;
+    padding: 2px;
+    flex-direction: column;
+  }
