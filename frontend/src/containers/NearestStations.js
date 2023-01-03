@@ -10,6 +10,10 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import EE2_Building_Southside from "./images/Stations/CSIE_Der_Tain_Hall.jpg"
 import { Button } from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { m } from 'framer-motion';
+import Modal from '../containers/map/modal';
+import { Form, redirect, useOutletContext } from 'react-router-dom';
 
 const stations = [
     {label: '1st Student Activity Center 第一學生活動中心', dist: 200},
@@ -38,19 +42,56 @@ const stations = [
     {label: 'Zonghe Lecture Building 綜合教學館', dist: 450},
 ]
 
+const densityToColor = (density) => {
+  if(density === 1) return 'lime';
+  else if(density === 2) return 'yellow';
+  else if(density === 3) return 'orange';
+  else if(density === 4) return 'red';
+  else if(density === 5) return 'purple';
+  else return 'grey';
+}
+
 const NearestStations = () => {  
   //stations.sort((a, b) => a.dist - b.dist);
+  const [scroll2, setScroll2] = useState(false)
+  const [modalOpen2, setModalOpen2] = useState(false);
+  const [selected, setSelected] = useState(0);
+  const [openParking, setOpenParking] = useState(false)
+  const [position, setPosition] = useState({lat: null, lng: null, time: null})
+
+  React.useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position)=> {
+        setPosition({lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
+        console.log("selected", {lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
+    })
+  },[])
+
+
   const handleGetAllStations = async() => {
     const {
       data: { stations },
     } = await axios.get('/stations');
     console.log("Handle get all stations")
     console.log(stations)
-    setAllStations(stations)
+    const stationsSorted = stations.sort((a, b) => calcDist(position, a.location) - calcDist(position, b.location));
+    setAllStations(stationsSorted)
+  }
+
+  const calcDist = (origin, location) => {
+    // if(location===undefined) return
+    return Math.sqrt((location.lat-origin.lat)*111.2*111.2*(location.lat-origin.lat) + (location.lng-origin.lng)*110.8*110.8*(location.lng-origin.lng))
+  }
+
+  var time_dis = {dur: 0, dis: 0}
+  const calculateRoute = () => {
+
   }
 
   const [allStations, setAllStations] = useState([]);
-  if(allStations.length === 0) handleGetAllStations();
+
+  React.useEffect(()=>{
+     handleGetAllStations();
+  },[position])
 
     return (<>
         <Typography gutterBottom variant="h4" component="div" marginLeft="12px">
@@ -60,14 +101,14 @@ const NearestStations = () => {
         <List sx={{ width: '100%', maxWidth: `calc(0.8*vw)`, bgcolor: 'background.paper' }}>
             {allStations.map((stop, index) => 
             <>
-            <ListItem alignItems="flex-start" justifyitems='center' key={stop.label} sx={{height: '116px'}}>
-                <ListItemAvatar sx={{height: '80px', width: '100px'}} >
+            <ListItem alignItems="flex-start" justifyitems='center' key={stop.label} sx={{height: '130px'}} >
+                <ListItemAvatar sx={{height: '80px', width: '100px'}} onClick={()=>{setScroll2(true); setSelected(index)}}>
                     <Avatar alt="Remy Sharp" src={stop.src} sx={{height: '80px', width: '80px'}}/>
                     {/* {EE2_Building_Southside} */}
                 </ListItemAvatar>
                 <ListItemText
                 primary={stop.label}
-                primaryTypographyProps={{variant: 'h5'}}
+                primaryTypographyProps={{variant: 'h6'}}
                 secondary={
                     <React.Fragment>
                     <Typography
@@ -77,13 +118,17 @@ const NearestStations = () => {
                         color="text.primary"
                     >
                        Distance: &nbsp; 
-                       <span style={{color: 'gray'}}> {`${stop.dist} meters`} </span>
+                       <span style={{color: 'gray'}}> {`${Math.ceil(calcDist(position, stop.location)*1000)} meters`} </span>
+                       &nbsp; &nbsp; &nbsp; &nbsp;
+                       Spaces left: &nbsp;
+                       <LocationOnIcon sx={{color: densityToColor(stop.density), fontSize: 36}}/>
                     </Typography>
                     </React.Fragment>
                 }
                 />
             </ListItem>
             <Divider variant="inset" component="li" key= {`${stop.label} divider`} />
+            <Modal open={true} scroll={scroll2} setScroll={setScroll2} data={allStations[selected]} calculateRoute={()=>calculateRoute()} time_dis={time_dis} setOpenParking={setOpenParking}></Modal>
                     </>
              )}
       {/* <ListItem alignItems="flex-start" sx={{height: '80px'}}>

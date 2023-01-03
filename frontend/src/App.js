@@ -14,8 +14,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const LOCALSTORAGE_KEY = "save_me";
 const loginBefore = localStorage.getItem(LOCALSTORAGE_KEY);
 function App() {
-  const {status,setStatus}=useApp();
+  const {status,setStatus,me}=useApp(); //me:真 即時更新的me 
   const [login, setLogin] = useState(loginBefore||false);
+  // const [username, setUsername] = useState("") 
   const device=useRWD();
   const location=useLocation();
   const navigate=useNavigate();
@@ -66,7 +67,9 @@ function App() {
     // <Homepage /> :
     // <LogIn onLogin={ () => setLogin(true) }/>
     // <ParkInModal></ParkInModal>
-    (login?(status==='LoggedIn'?<Menu val={setLogin}/>:<Homepage/>):(status==="LoggedOut"?<FirstPage/>:(status==='LoggingIn'?(device==='PC'?<LoginPage/>:<Loginmobile/>):
+    // <Homepage username={username}/> :
+    // <LogIn onLogin={ () => setLogin(true) } setUsername={setUsername}/>
+    (login?(status==='LoggedIn'?<Menu val={setLogin}/>:<Homepage username={me.email}/>):(status==="LoggedOut"?<FirstPage/>:(status==='LoggingIn'?(device==='PC'?<LoginPage />:<Loginmobile/>):
     ((status==="LoggedIn")?<Menu val={setLogin}/>:<></>))))
   );
 }

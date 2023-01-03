@@ -113,7 +113,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-export default function MiniDrawer() {
+export default function MiniDrawer({username}) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [menuSelectedIndex, setMenuSelectedIndex] = React.useState(0);
@@ -222,7 +222,7 @@ export default function MiniDrawer() {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         {/* <Typography paragraph> */}
-          <Outlet />
+          <Outlet context={[username]} />
         {/* </Typography> */}
       </Box>
     </Box>

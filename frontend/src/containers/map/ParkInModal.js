@@ -6,9 +6,10 @@ import Modal from '@mui/material/Modal';
 import "../css/ParkInModal.scss"
 import { Input } from '@chakra-ui/react';
 import ReactStars from "react-rating-stars-component" ;
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 import axios from '../../connection';
 import { formatRelative } from "date-fns";
+import { useOutletContext } from 'react-router-dom';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -27,7 +28,8 @@ export default function ParkInModal({openParking, setOpenParking, getUserPositio
   const handleClose = () => setOpen(false);
   const [rating, setRating] = useState(0)
   const [bikeClicked, setBikeClicked] = useState(0)
-  
+  const [username] = useOutletContext();
+
   const addParkingSpot = async() => {
     if(rating===0) alert("Please select the bike density !")
     let tok = await getUserPosition();
@@ -44,15 +46,23 @@ export default function ParkInModal({openParking, setOpenParking, getUserPositio
     await axios.post('/myBike', {
       // TODO Part III-3-b: store the comment to the DB
       location: {lat: data.location.lat, lng: data.location.lng},
-      rating: rating,
-      time: formatRelative(data.time, new Date())
+      time: formatRelative(data.time, new Date()),
+      username: data.username,
+      parked: false,
+      parkedAt: data.parkedAt
   })
+  const {
+    data: { messageStation },
+  } = await axios.post('/stations', {
+      label: data.parkedAt, density:  rating
+  });
   }
 
   useEffect(()=>{
  
-    let tok2 = {location: {lat: spot.lat, lng: spot.lng}, time: spot.time, rating: rating}
+    let tok2 = {location: {lat: spot.lat, lng: spot.lng}, time: spot.time, rating: rating, parked: false, username: username, parkedAt: spot.label}
     // setParkingSpots([...parkingSpots, tok2])
+    console.log("name: ", tok2)
     saveMyBike(tok2)
   }, [spot])
 

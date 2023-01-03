@@ -1,4 +1,4 @@
-/* -- */
+/* -*/
 @-webkit-keyframes blink {
     from, 25%, to {
         opacity: 1;
@@ -85,29 +85,19 @@
         transform: translate3d(0, -4px, 0) scaleY(1.02);
    }
 }
-body {
-    margin: 0px;
-    overflow-x: hidden;
-    padding: 0px;
-}
+
 body::-webkit-scrollbar-track {
     background-color: #1e1e1e;
 }
 body::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(231, 20, 20, 0.2);
     border-radius: 100px;
 }
 body::-webkit-scrollbar {
     height: 4px;
     width: 4px;
 }
-body input, body h1, body h3, body a, body span {
-    color: #5a5a5a;
-    font-family: "Rubik", sans-serif;
-    font-weight: 400;
-    margin: 0px;
-    padding: 0px;
-}
+
 .background-image {
     background-position: center;
     background-repeat: no-repeat;
@@ -866,3 +856,15 @@ body input, body h1, body h3, body a, body span {
     font-weight: 300;
     }
 }
+/* body input, body h1, body h3, body a, body span {
+    color: #5a5a5a;
+    font-family: "Rubik", sans-serif;
+    font-weight: 400;
+    margin: 0px;
+    padding: 0px;
+} */
+/* body {
+    margin: 0px;
+    overflow-x: hidden;
+    padding: 0px;
+} */

@@ -14,13 +14,13 @@ function LittleCircle({panToOrigin, clearRoute, setShowStation, setOpenParking,s
         <span class="lines line-2"></span>
         <span class="lines line-3"></span>
     </label>
-    {/* <i class="fa fa-diamond"></i> <DirectionsBikeIcon className="circleIcon"></DirectionsBikeIcon>*/}
-    <a href="#" class="menu-item blue"  onClick={()=>{panToOrigin()}}><NavigationIcon className="circleIcon"/></a>
-    <a href="#" class="menu-item green" onClick={()=>{setShowStation(!showStation)}}> <MyLocationIcon className="circleIcon"></MyLocationIcon> </a>
-    <a href="#" class="menu-item red" onClick={()=>{setCountStyle((countStyle+1)%3)}}> <DesignServicesIcon className="circleIcon"></DesignServicesIcon></a>
-    <a href="#" class="menu-item purple" onClick={()=>{setOpenParking(true); setScroll(false);}}><LocalParkingTwoToneIcon className="circleIcon"></LocalParkingTwoToneIcon></a>
-    <a href="#" class="menu-item lightblue" onClick={()=>{findMyBike()}}> <i class="fa fa-diamond"></i> <DirectionsBikeIcon className="circleIcon"></DirectionsBikeIcon> </a>
-    <a href="#" class="menu-item orange" onClick={()=>{clearRoute()}}> <ReplayIcon className="circleIcon"/> </a>
+
+    <a href="#" class="menu-item blue"  title="回到現在位置" onClick={()=>{panToOrigin()}}><NavigationIcon className="circleIcon"/></a>
+    <a href="#" class="menu-item green" title={!showStation ? "開起站點資訊" : "關閉站點資訊"} onClick={()=>{setShowStation(!showStation)}}> <MyLocationIcon className="circleIcon"></MyLocationIcon> </a>
+    <a href="#" class="menu-item red" title="切換地圖樣式" onClick={()=>{setCountStyle((countStyle+1)%3)}}> <DesignServicesIcon className="circleIcon"></DesignServicesIcon></a>
+    {/* <a href="#" class="menu-item purple" title="停車" onClick={()=>{setOpenParking(true); setScroll(false);}}><LocalParkingTwoToneIcon className="circleIcon"></LocalParkingTwoToneIcon></a> */}
+    <a href="#" class="menu-item lightblue" title="導航到上次停車位置" onClick={()=>{findMyBike()}}><DirectionsBikeIcon className="circleIcon"></DirectionsBikeIcon> </a>
+    <a href="#" class="menu-item orange" title="重整畫面" onClick={()=>{clearRoute()}}> <ReplayIcon className="circleIcon"/> </a>
     </nav>
     </>
 }

@@ -107,7 +107,15 @@ input:checked + .slide-container .nav label { display: block; }
 	cursor: pointer;
 	background-color: rgba(0, 0, 0, 1);
 }
-
+@media(max-height: 750px) {
+    .slide img {
+        width: 100%;
+        height: 60%;
+    }
+    .nav label {
+        line-height: 50vh;
+    }
+}
 /* input#img-1:checked ~ .nav-dots label#img-dot-1,
 input#img-2:checked ~ .nav-dots label#img-dot-2,
 input#img-3:checked ~ .nav-dots label#img-dot-3,

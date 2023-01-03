@@ -259,12 +259,20 @@ body {
     border-radius: 1em;
 }
 
-@media(max-width: 750px) {
-  .modal-container {
-    width: 90%;
-  }
-//   .modal-right {
-//     display: none;
+// @media(max-width: 750px) {
+//   .modal-container {
+//     width: 90%;
 //   }
+  
+// //   .modal-right {
+// //     display: none;
+// //   }
+// }
+@media(max-height: 750px) {
+  .modal-container {
+    height: 90%;
+  }
+  .modal-title{
+    font-size:17px;
+  }
 }
-

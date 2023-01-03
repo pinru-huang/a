@@ -15,7 +15,8 @@ import mapStyle_2 from './mapStyle_2';
 // import stations from '../stationsData/stations';
 import ParkInModal from "./ParkInModal"
 import axios from '../../connection';
-
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { useOutletContext } from 'react-router-dom';
 const center = { lat: 48.8584, lng: 2.2945 }
 
 
@@ -42,19 +43,27 @@ function Map () {
     const [stations, setStations] = useState([]) 
     const [mapStyle, setMapStyle] = useState([null, mapStyle_1, mapStyle_2])
     const [countStyle, setCountStyle]= useState(0)
+    const [username] = useOutletContext();
+    // const [stationDist, setStationDist] = useState([])
+    var stationsDist=[]
         /** @type React.MutableRefObject<HTMLInputElement> */
     const originRef = useRef("")
         /** @type React.MutableRefObject<HTMLInputElement> */
     const destinationRef = useRef('')
     const time_disRef = useRef({dis: "", dur: ""})
+    const distCount = useRef(0)
     // let destination=null;
     // let origin=null;
-    console.log("hi", markers)   
+    // console.log("hi", markers)   
     
     const getStations = async()=> {
       const {
         data: { stations },
       } = await axios.get('/stations');
+      // for(let i=0; i<stations.length; i++){
+      //    getTime_Dis(stations[i].location)
+      //   // distData.push(getTime_Dis(stations[i].location))
+      // }
       setMarkers(stations)
       setStations(stations)
       return;
@@ -64,13 +73,37 @@ function Map () {
         navigator.geolocation.getCurrentPosition((position)=> {
             setSelected({lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
             getStations()
+            console.log("selected", {lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
         })
     }, [])
        
+    useEffect(()=> {
+      if(stations.length!==0){
+       for(let i=0; i<stations.length; i++){
+          console.log(stations[i].location.lat, selected.lat, stations[i].location.lng)
+          let dis = Math.sqrt((stations[i].location.lat-selected.lat)*111.2*111.2*(stations[i].location.lat-selected.lat) + (stations[i].location.lng-selected.lng)*110.8*110.8*(stations[i].location.lng-selected.lng))
+          stationsDist.push({dist: dis*1000, label: stations[i].label})
+          // saveDist(dis, stations[i].label)
+          console.log(stationsDist);
+          // console.log('gugo ')
+        // distData.push(getTime_Dis(stations[i].location))
+        }
+      // saveDist();
+    }
+    
+      // console.log("disData", distData)
+    }, [stations])
+
+    const saveDist = async() => {
+      await axios.post("/stations/distance", {
+        distances: stationsDist,
+    })
+    }
+
     const getUserPosition = async() => {
       let parkingSpot=null;
       await navigator.geolocation.getCurrentPosition((position)=> {
-        parkingSpot = {lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()}
+        parkingSpot = {lat: position.coords.latitude, lng: position.coords.longitude, time: new Date(), label: stations[markerSelected].label}
         
         setSpot(parkingSpot);
       
@@ -151,8 +184,11 @@ function Map () {
       let dur = results.routes[0].legs[0].duration.text
       console.log("dis: ", dis, dur)
       setTime_Dis({dis: dis, dur: dur})
+      // setStationDist([...stationDist, {dis: dis, dur: dur}])
+      stationsDist.push({dis: dis, dur: dur})
+      console.log(stationsDist, stations.length)
       time_disRef.current = {dis: dis, dur: dur}
-      return  {dis: dis, dur: dur}
+      // return  {dis: dis, dur: dur}
     }  
 
     const panToOrigin = () => {
@@ -165,11 +201,25 @@ function Map () {
     }
 
     const findMyBike = async() => {
-      const {data:data} = await axios.get("/myBike")
+      const {data:data} = await axios.get("/myBike", {
+        params: {
+            username
+        }
+    })
       originRef.current=selected
       calculateRoute(data.myBike.location)
       console.log(data.myBike)
       
+    }
+
+    const densityToColor = (density) => {
+      if(density === 1) return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+      else if(density === 2) return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+      else if(density === 3) return 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png';
+      else if(density === 4) return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+      else if(density === 5) return 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png';
+      // else return "bike.png"
+      else return 'https://www.1stdynamicpersonnel.com/wp-content/uploads/2019/09/location_map_pin_gray5.png';
     }
 
     if (!isLoaded) {
@@ -213,7 +263,7 @@ function Map () {
                 onLoad={map => setMap(map)}
                 onRightClick={mapsMouseEvent=>{onMapClick(mapsMouseEvent)}}//右鍵時加入新marker
               >
-                <Marker key={selected} position={selected} icon={{
+                <Marker title='現在位置' key={selected} position={selected} icon={{
                     url: "placeholder.png",
                     origin: new window.google.maps.Point(0, 0),
                     anchor: new window.google.maps.Point(15, 15),
@@ -223,11 +273,10 @@ function Map () {
                 />
                 {markers&&showStation ? markers.map((marker, idx)=>(   
                   <Marker key={marker.location.lat+idx} position={marker.location} icon={{
-                    url: getBikeImg(),
+                    url: densityToColor(marker.density),
                     origin: new window.google.maps.Point(0, 0),
                     anchor: new window.google.maps.Point(15, 15),
                     scaledSize: new window.google.maps.Size(30, 30),
-                    
                   }}
                   onClick={() => {
                     setTime_Dis(getTime_Dis(marker.location)) 
@@ -245,7 +294,7 @@ function Map () {
                     destinationRef.current = marker.location
                     originRef.current=selected
                   }}
-                  />
+                  ></Marker>
                 )): ''}
                 {directionsResponse && (
                   <DirectionsRenderer directions={directionsResponse} />//與路徑有關

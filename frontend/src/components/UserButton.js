@@ -1,16 +1,30 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../hook";
+import api from "../connection";
+import { FormControlUnstyledContext } from "@mui/base";
+const TOKEN_KEY ='token';
 const UserStatusButton = (props) => {
     const { status,setStatus} = useApp();
     const navigate=useNavigate();
     const handleOnClick = async() => {
       if(props.userStatus==='LoggedOut'){
         // navigate('/');
-        props.val(false);
-        console.log('hhhh');
-         setStatus(props.userStatus);
-        localStorage.clear();
+        
+         try{
+          await api.post('/users/logout')
+          localStorage.remove(TOKEN_KEY);
+          console.log('logout');
+          props.val(false);
+          console.log('hhhh');
+          setStatus(props.userStatus);
+        }catch(e){
+          console.log('logout err');
+          console.log(localStorage.getItem(TOKEN_KEY));
+          props.val(false);
+          setStatus(props.userStatus);
+
+        }
       }else{
         const background=document.getElementById("app-background-image");
         //const login=document.getElementById("container");

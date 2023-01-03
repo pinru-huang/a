@@ -2,7 +2,7 @@ import React, { useState ,useEffect,useRef} from 'react'
 import { useLocation,useNavigate } from 'react-router-dom'
 import login from'./css/login.module.css'
 import { useApp } from '../hook'
-
+import api from '../connection';
 import styled from 'styled-components'
 
 //import { faCoffee } from '@fortawesome/free-solid-svg-icons'
@@ -101,6 +101,7 @@ const Warning=styled.p`
 	text-shadow: 0.05em 0.05em 0.01em black
 	}
 `;
+const TOKEN_KEY ='token';
 
 const LoginPage=()=>{
     const [inup,setInup]=useState(true);
@@ -112,7 +113,7 @@ const LoginPage=()=>{
 	const [passwords,setPasswords]=useState('');
     // const ref = React.useRef(null);
 	let location=useLocation();
-	const {status,setStatus,data,handlelogin,handlesignup,handleUpdateInfo,err,setErr}=useApp();
+	const {status,setStatus,data,handlelogin,handlesignup,handleUpdateInfo,err,setErr,setMe}=useApp();
 	const navigate=useNavigate();
 	// const handleclick=async()=>{
 	
@@ -149,13 +150,32 @@ const LoginPage=()=>{
 		}
 		console.log('err: '+err);
 	},[err])
-	const handlesubmitl=(e)=>{
+	const handlesubmitl=async(e)=>{
 		e.preventDefault();
-		handlelogin(email,password);
+		// handlelogin(email,password);
+		try{
+			const {data:{user,token}}=await api.post('/users/login',{email,password})
+			if(token){
+				localStorage.setItem(TOKEN_KEY,token);
+				setStatus('LoggedIn');
+				setMe(user);
+				
+				console.log(user);
+			}
+		}catch(e){
+			setErr('l')
+		}
 	}
-	const handlesubmits=(e)=>{
+	const handlesubmits=async(e)=>{
 		e.preventDefault();
-		handlesignup(names,emails,passwords);
+		// handlesignup(names,emails,passwords);
+		try{
+			const {data:{user,token}}= await api.post('/users/',{name:names,email:emails,password:passwords})
+			setErr('n');
+		}catch(e){
+			console.log(e);
+			setErr('s');
+		}
 	}
 	useEffect(()=>{
 	  console.log(location);

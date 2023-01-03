@@ -4,7 +4,7 @@ import Pictures from "./switchPictures"
 function Modal({open, scroll, setScroll, data, calculateRoute, time_dis, setOpenParking}){
     // const [openParking, setOpenParking] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
-    console.log("t: ", time_dis.dur)
+    // console.log("t: ", time_dis.dur)
     const getPriceTag = (price) => {
       let priceText = ""
       for (let i = 0; i < price; i++)
@@ -84,7 +84,7 @@ function Modal({open, scroll, setScroll, data, calculateRoute, time_dis, setOpen
       </div> */}
       <div className="modal-buttons">
         {/* <a href="" className="">Forgot your password?</a> */}
-        {/* <button className="input-button" style={{marginLeft: "auto", marginRight: "auto"}} onClick={()=>{setOpenParking(true); setScroll(false);}}>Park In</button> */}
+        <button className="input-button" style={{marginLeft: "auto", marginRight: "auto"}} onClick={()=>{setOpenParking(true); setScroll(false);}}>Park In</button>
         <button className="input-button" style={{marginLeft: "auto", marginRight: "auto"}} onClick={()=>{calculateRoute(0); setScroll(false)}}>navigate</button>
       </div>
       {/* <p className="sign-up">Don't have an account? <a href="#">Sign up now</a></p> */}

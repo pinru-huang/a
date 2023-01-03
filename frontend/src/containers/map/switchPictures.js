@@ -1,15 +1,15 @@
 import "../css/switchPicture.css"
 function Pictures({pics}) {
     
-    console.log(pics)
+    // console.log(pics)
     return <>
     <ul class="slides">
         {pics.map((pic, idx)=>(
             <>
-                <input type="radio" name="radio-btn" id={idx} key={idx} checked />
-                <li class="slide-container">
-                    <div class="slide">
-                        <img src={pic} />
+                <input type="radio" name="radio-btn" id={idx} key={idx} defaultChecked/>
+                <li key={"list" + idx} class="slide-container">
+                    <div key={"div" + idx} class="slide">
+                        <img key={"img" + idx} src={pic} />
                     </div>
                     <div class="nav">
                         {pics.length===1 ? null : <label for={idx===0 ? pics.length-1 : idx-1} class="prev">&#x2039;</label>}
@@ -28,7 +28,6 @@ function Pictures({pics}) {
 			<label for="img-2" class="next">&#x203a;</label>
 		</div>
     </li>
-
     <input type="radio" name="radio-btn" id="img-2" />
     <li class="slide-container">
         <div class="slide">
@@ -39,7 +38,6 @@ function Pictures({pics}) {
 			<label for="img-3" class="next">&#x203a;</label>
 		</div>
     </li>
-
     <input type="radio" name="radio-btn" id="img-3" />
     <li class="slide-container">
         <div class="slide">
@@ -50,7 +48,6 @@ function Pictures({pics}) {
 			<label for="img-4" class="next">&#x203a;</label>
 		</div>
     </li>
-
     <input type="radio" name="radio-btn" id="img-4" />
     <li class="slide-container">
         <div class="slide">
@@ -61,7 +58,6 @@ function Pictures({pics}) {
 			<label for="img-5" class="next">&#x203a;</label>
 		</div>
     </li>
-
     <input type="radio" name="radio-btn" id="img-5" />
     <li class="slide-container">
         <div class="slide">
@@ -72,7 +68,6 @@ function Pictures({pics}) {
 			<label for="img-6" class="next">&#x203a;</label>
 		</div>
     </li>
-
     <input type="radio" name="radio-btn" id="img-6" />
     <li class="slide-container">
         <div class="slide">

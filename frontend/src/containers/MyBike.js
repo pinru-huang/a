@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import axios from '../connection';
+import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -11,17 +12,56 @@ import Chip from '@mui/material/Chip';
 import NTU_at_night from "../containers/images/NTU_at_night.jpg";
 //Form
 import TextField from '@mui/material/TextField';
+import Rating from '@mui/material/Rating';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Form, redirect } from 'react-router-dom';
+import { Form, redirect, useOutletContext } from 'react-router-dom';
 import "./css/buttons.css";
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import CloseIcon from '@mui/icons-material/Close';
+import { duration } from '@mui/material';
+
+const crowdedLabels = {
+    1: 'Empty 車位很空',
+    2: 'Plenty of spaces 仍有許多車位',
+    3: 'Normal/Some spaces left 尚有一些車位',
+    4: 'Full of bikes 很多腳踏車',
+    5: 'No spaces left 無位可停',
+  };
+
+  function getLabelText(value) {
+    return `${value} Star${value !== 1 ? 's' : ''}, ${crowdedLabels[value]}`;
+  }
 
 function MyBike () {
-    const [parked, setParked] = useState(true);
+    const [refreshedFirstTime, setRefreshedFirstTime] = useState(false)
+    const [parked, setParked] = useState(false);
     const [parkLocation, setParkLocation] = useState("")
+    const [crowdednessValue, setCrowdednessValue] = React.useState(0);
+    const [crowdedHover, setCrowdedHover] = useState(-1)
+    const [username] = useOutletContext();
+    const [errorMessage, setErrorMessage] = useState("")
+    const [errorOpen, setErrorOpen] = React.useState(true);
+    const [successMessage, setSuccessMessage] = useState("")
+    const [successOpen, setSuccessOpen] = React.useState(true);
+    const [position, setPosition] = useState({lat: null, lng: null, time: null})
+
+    React.useEffect(() => {
+        navigator.geolocation.getCurrentPosition((position)=> {
+            setPosition({lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
+            console.log("selected", {lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
+        })
+    },[])
+
     const handleGetMyBike = async() => {
         const {
           data: { myBike },
-        } = await axios.get('/myBike');
+        } = await axios.get('/myBike', {
+            params: {
+                username
+            }
+        });
         console.log("Handle get my Bike")
         console.log(myBike)
         if(myBike){
@@ -31,11 +71,108 @@ function MyBike () {
         //setAllStations(stations)
     }
 
-    return ( 
+    const handleParkMyBike = async() => {
+        const {
+          data: { message, myBike },
+        } = await axios.post('/myBike', {
+            username, parked, parkedAt: parkLocation, time: new Date(), location: {lat: position.lat, lng: position.lng}
+        });
+        console.log("Handle post my Bike")
+        console.log(myBike)
+        if(!myBike){
+            setErrorOpen(true);
+            setErrorMessage("Database post my bike error!")
+        } else  {
+            setSuccessOpen(true);
+            setSuccessMessage("Successfully saved your bike position in database.")
+            setTimeout(function () {
+                setSuccessOpen(false)
+                setSuccessMessage("")
+            }, 10000);//10 Second delay 
+        }
+        const {
+            data: { messageStation },
+          } = await axios.post('/stations', {
+              label: parkLocation, density:  crowdednessValue
+          });
+        //setAllStations(stations)
+    }
+
+    const handleRideMyBike = async() => {
+        const {
+          data: { message, myBike },
+        } = await axios.post('/myBike', {
+            username, parked, parkedAt: parkLocation, time: new Date(), location: {lat: position.lat, lng: position.lng} 
+        });
+        console.log("Handle post my Bike")
+        console.log(myBike)
+        if(!myBike){
+            setErrorOpen(true);
+            setErrorMessage("Database post my bike error!")
+        } else  {
+            setSuccessOpen(true);
+            setSuccessMessage("Successfully updated your bike status in database.")
+            setTimeout(function () {
+                setSuccessOpen(false)
+                setSuccessMessage("")
+            }, 10000);//10 Second delay 
+        }
+        //setAllStations(stations)
+    }
+    
+    if(!refreshedFirstTime){
+        handleGetMyBike();
+        setRefreshedFirstTime(true);
+    }
+
+    return ( <>
+        <Box sx={{ width: '50%', position:"fixed", left: "50%", top:"12%", transform: "translate(-50%, 0)" }}>
+            { errorMessage? <Collapse in={errorOpen}>
+                <Alert severity='error'
+                action={
+                    <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                        setErrorOpen(false);
+                        setErrorMessage("");
+                    }}
+                    >
+                    <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                }
+                sx={{ mb: 2 }}
+                >
+                {errorMessage}
+                </Alert>
+            </Collapse> : <></>}
+            {successMessage? <Collapse in={successOpen}>
+                <Alert severity='success'
+                action={
+                    <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                        setSuccessOpen(false);
+                        setSuccessMessage("");
+                    }}
+                    >
+                    <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                }
+                sx={{ mb: 2 }}
+                >
+                {successMessage}
+                </Alert>
+            </Collapse> : <></>}
+        </Box> 
+        
         <Card sx={{ maxWidth: `calc(0.8*vw)` }}>
             <CardContent>
                 <Typography gutterBottom variant="h4" component="div">
-                    My Bike
+                    {username}'s Bike
                 <Button onClick={ handleGetMyBike }> Refresh </Button>
                 </Typography>
             </CardContent>
@@ -59,7 +196,7 @@ function MyBike () {
                 <Typography variant="body2" color="text.secondary">
                 
                 </Typography>
-                <br></br>
+                
                 <Autocomplete
                     disablePortal
                     onInputChange={(event, newInputValue) => {
@@ -70,18 +207,64 @@ function MyBike () {
                     sx={{ width: 300 }}
                     renderInput={(params) => <TextField {...params} label="Parking Spot" />}
                 />
+                <br></br>
+                <Typography gutterBottom variant="h6" component="div">
+                    How many bikes are there?
+                </Typography>
+                <Rating
+                    name="simple-controlled"
+                    value={crowdednessValue}
+                    getLabelText={getLabelText}
+                    onChange={(event, newValue) => {
+                        setCrowdednessValue(newValue);
+                    }}
+                    onChangeActive={(event, newHover) => {
+                        setCrowdedHover(newHover);
+                    }}
+                />{crowdednessValue !== null && (
+                    <Box sx={{ ml: 2 }}>{crowdedLabels[crowdedHover !== -1 ? crowdedHover : crowdednessValue]}</Box>
+                )}
             </CardContent>
             <CardActions>
                 <Form>
                     <button type='submit' className='button-19'
-                    onClick={()=> setParked(!parked)}>{parked? "Ride my bike" : "Park my bike"}</button>
+                    //disabled={!parkLocation || !crowdednessValue}
+                    onClick={async ()=> {
+                        if(!parked && !parkLocation && !crowdednessValue){
+                            setErrorOpen(true)
+                            setErrorMessage("Parking spot and rating of how many bikes is required."); 
+                            setTimeout(function () {
+                                setErrorOpen(false)
+                                setErrorMessage("")
+                            }, 10000);//10 Second delay   
+                        
+                            return;
+                        } else if (!parked && !parkLocation){
+                            setErrorOpen(true)
+                            setErrorMessage("Parking spot is required."); 
+                            return;
+                        } else if (!parked && !crowdednessValue){
+                            setErrorOpen(true)
+                            setErrorMessage("Rating of how many bikes is required."); 
+                            return;
+                        }
+                        if(!parked){
+                            setCrowdednessValue(0)
+                            await handleParkMyBike();
+                            await handleGetMyBike({ username });
+                        }else{
+                            await handleRideMyBike();
+                            await handleGetMyBike({ username });
+                        }
+                        //setParked(!parked)
+                    }}>{parked? "Ride my bike" : "Park my bike"}</button>
                 </Form>
                 &nbsp;
                 <Form method="post"> 
                     <button type='submit' className='button-19'>Back to Home</button>
                 </Form>
             </CardActions>
-        </Card>        
+        </Card> </>       
     )
 }
 
