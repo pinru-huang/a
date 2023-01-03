@@ -13,7 +13,7 @@ const Restaurants = () => {
     const getRestaurants = () => {
       return [
         {
-          desc: "The best burgers in town",
+          desc: "Find the best place to park",
           id: 1,
           // image:
           //  "https://images.unsplash.com/photo-1606131731446-5568d87113aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8YnVyZ2Vyc3xlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
@@ -22,7 +22,7 @@ const Restaurants = () => {
           title: "MAP"
         },
         {
-          desc: "The worst ice-cream around",
+          desc: "More about your bike",
           id: 2,
           // image:
           //   "https://images.unsplash.com/photo-1576506295286-5cda18df43e7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8aWNlJTIwY3JlYW18ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
@@ -30,7 +30,7 @@ const Restaurants = () => {
           title: "MY BIKE"
         },
         {
-          desc: "This 'Za be gettin down",
+          desc: "Choose a stop and navigate",
           id: 3,
           // image:
           //   "https://images.unsplash.com/photo-1590947132387-155cc02f3212?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8cGl6emF8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
@@ -38,7 +38,7 @@ const Restaurants = () => {
           title: "NEARST STATION"
         },
         {
-          desc: "BBQ ain't need no rhyme",
+          desc: "Set your password",
           id: 4,
           // image:
           //   "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8YmFyYmVxdWV8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",

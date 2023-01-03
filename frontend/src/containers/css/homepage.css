@@ -389,7 +389,7 @@ body::-webkit-scrollbar {
 #app #restaurants-section .menu-section-content .restaurant-card {
     border-radius: 10px;
     cursor: pointer;
-    height: 3vw;
+    height: 50vw;
     max-height: 240px;
     position: relative;
     transition: transform 250ms;
