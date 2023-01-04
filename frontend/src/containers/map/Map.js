@@ -18,6 +18,10 @@ import axios from '../../connection';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useOutletContext } from 'react-router-dom';
 import { useApp } from "../../hook";
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import CloseIcon from '@mui/icons-material/Close';
 const center = { lat: 48.8584, lng: 2.2945 }
 
 
@@ -46,6 +50,8 @@ function Map () {
     const [countStyle, setCountStyle]= useState(0)
     const [username] = useOutletContext();
     const {defaultLocation,setDefaultLocation}=useApp();
+    const [errorMessage,setErrorMessage ] = useState("")
+    const [successMessage, setSuccessMessage] = useState("")
     // const [stationDist, setStationDist] = useState([])
     var stationsDist=[]
         /** @type React.MutableRefObject<HTMLInputElement> */
@@ -236,7 +242,49 @@ function Map () {
       // return <SkeletonText />
     }
     return (<>
-        
+        <Box sx={{ width: '50%', position:"fixed", left: "50%", top:"12%", transform: "translate(-50%, 0)" }}>
+      { errorMessage? <Collapse in={errorMessage}>
+                <Alert severity='error'
+                action={
+                    <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                        // setErrorOpen(false);
+                        setErrorMessage("");
+                    }}
+                    >
+                    <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                }
+                sx={{ mb: 2 }}
+                >
+                {errorMessage}
+                </Alert>
+            </Collapse> : <></>}
+            
+            {successMessage? <Collapse in={successMessage}>
+                <Alert severity='success'
+                action={
+                    <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                        // setSuccessOpen(false);
+                        setSuccessMessage("");
+                    }}
+                    >
+                    <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                }
+                sx={{ mb: 2 }}
+                >
+                {successMessage}
+                </Alert>
+            </Collapse> : <></>}
+            </Box>
         <Flex
             position='relative'
             flexDirection='column'
@@ -310,7 +358,7 @@ function Map () {
                 )}
               </GoogleMap>
               <Modal open={modalOpen} scroll={scroll} setScroll={setScroll} data={stations[markerSelected]} calculateRoute={()=>calculateRoute(destinationRef.current)} time_dis={time_dis} setOpenParking={setOpenParking}></Modal>
-              {openParking? <ParkInModal openParking={openParking} setOpenParking={setOpenParking} getUserPosition={getUserPosition} parkingSpots={parkingSpots} setParkingSpots={setParkingSpots} spot={spot}></ParkInModal> : null}
+              {openParking? <ParkInModal openParking={openParking} setOpenParking={setOpenParking} getUserPosition={getUserPosition} parkingSpots={parkingSpots} setParkingSpots={setParkingSpots} spot={spot} setErrorMessage={setErrorMessage} setSuccessMessage={setSuccessMessage}></ParkInModal> : null}
             </Box>
            </Flex></>
          )

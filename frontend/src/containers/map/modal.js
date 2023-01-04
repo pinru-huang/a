@@ -58,6 +58,7 @@ function Modal({open, scroll, setScroll, data, calculateRoute, time_dis, setOpen
     if(!open) {
       return <></>
     }
+    if(!data) return <></>
     return <>
     
     {/* <div className="scroll-down" > */}

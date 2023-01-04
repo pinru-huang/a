@@ -22,17 +22,24 @@ const style = {
   p: 4,
 };
 
-export default function ParkInModal({openParking, setOpenParking, getUserPosition, parkingSpots, setParkingSpots, spot}) {
+export default function ParkInModal({openParking, setOpenParking, getUserPosition, spot, setErrorMessage, setSuccessMessage}) {
   const [open, setOpen] = React.useState(true);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [rating, setRating] = useState(0)
   const [bikeClicked, setBikeClicked] = useState(0)
   const [username] = useOutletContext();
-
+  const [parked, setParked] = useState(false)
   const addParkingSpot = async() => {
-    if(rating===0) alert("Please select the bike density !")
+    if(rating===0) {
+      setErrorMessage("Rating of how many bikes is required.")
+      setOpenParking(false)
+      
+      return;
+    }
     let tok = await getUserPosition();
+    setSuccessMessage("Successfully saved your bike position in database.")
+    setOpenParking(false)
     // setTimeout(console.log('jiji'), 1000)
     console.log("fuck", spot)
     
@@ -59,16 +66,32 @@ export default function ParkInModal({openParking, setOpenParking, getUserPositio
   }
 
   useEffect(()=>{
- 
+    console.log("spot: ", spot)
     let tok2 = {location: {lat: spot.lat, lng: spot.lng}, time: spot.time, rating: rating, parked: false, username: username, parkedAt: spot.label}
     // setParkingSpots([...parkingSpots, tok2])
     console.log("name: ", tok2)
+    if(spot.lat!=="")
     saveMyBike(tok2)
   }, [spot])
 
+  const getMyBikeStatus = async()=> {
+    const {
+      data: { myBike },
+    } = await axios.get('/myBike', {
+        params: {
+            username
+        }
+    });
+    setParked(myBike.parked)
+  }
+
+  getMyBikeStatus()
   useEffect(()=>{
-    console.log(parkingSpots)
-  }, [parkingSpots])
+    if(parked){
+      setOpenParking(false);
+      setErrorMessage("You have already parked your bike")
+    }
+  },[parked])
 
   return (
     <div>

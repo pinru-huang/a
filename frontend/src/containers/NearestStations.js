@@ -15,33 +15,12 @@ import { m } from 'framer-motion';
 import Modal from '../containers/map/modal';
 import { Form, redirect, useOutletContext } from 'react-router-dom';
 import { useApp } from "../hook";
-const stations = [
-    {label: '1st Student Activity Center 第一學生活動中心', dist: 200},
-    {label: 'Astronomy Mathematics Building 天文數學館', dist: 1500},
-    {label: 'Barry Lam Hall 博理館', dist: 300, src: "/static/media/Barry_Lam_Hall.450fe36207c086a7f957.PNG",
-    location:{latitude: 25.019217, longitude: 121.542462}},
-    {label: 'Boya Lecture Building 博雅教學館', dist: 1200},
-    {label: 'Center for Condensed Matter Sciences 凝態科學中心/物理系', dist: 1700},
-    {label: 'College of Liberal Arts 文學院', dist: 900},
-    {label: 'CSIE Der Tain Hall 德田館(資工系)', dist: 250, src: "/static/media/CSIE_Der_Tain_Hall.58c8386d988cea018508.jpg",
-    location:{latitude: 25.019448298802605, longitude: 121.54144852479706}},
-    {label: 'CSIE Der Tain Hall Northside 德田館(資工系)北側', dist: 350},
-    {label: 'Department of Psychology North Hall 心理系北館', dist: 500},
-    {label: 'Department of Psychology South Hall 心理系南館', dist: 390},
-    {label: 'EE-2 building Southside 電機二館南側', dist: 50, src: "/static/media/EE-2_Building_Southside.28baf89d8937375365f0.jpg",
-    location:{latitude: 25.018467, longitude: 121.542027}},
-    {label: 'EE-2 building Northside 電機二館北側', dist: 260,
-    location:{latitude: 25.019135, longitude: 121.541993}},
-    {label: 'Gontong Lecture Building 共同教學館', dist: 1900},
-    {label: 'Main Library 總圖書館', dist: 200},
-    {label: 'Ming Dar Hall 明達館', dist: 270},
-    {label: 'MK Innovation Hall 學新館', dist: 320},
-    {label: 'Putong Lecture Building 普通教學館', dist: 1000},
-    {label: 'Social Sciences Building 社科院', dist: 480},
-    {label: 'Xinsheng Lecture Building 新生教學館', dist: 700},
-    {label: 'Zonghe Lecture Building 綜合教學館', dist: 450},
-]
-
+import ParkInModal from './map/ParkInModal';
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import CloseIcon from '@mui/icons-material/Close';
+import { Box, Flex } from '@chakra-ui/react'
 const densityToColor = (density) => {
   if(density === 1) return 'lime';
   else if(density === 2) return 'yellow';
@@ -59,6 +38,10 @@ const NearestStations = () => {
   const [openParking, setOpenParking] = useState(false)
   const [position, setPosition] = useState({lat: null, lng: null, time: null})
   const {defaultLocation,setDefaultLocation}=useApp();
+  const [errorMessage,setErrorMessage ] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
+  const [spot, setSpot] = useState({lat: "", lng: "", time: ""})
+  const [time_dis, setTime_Dis] = useState({dis: "", dur: ""})
   React.useEffect(() => {
     navigator.geolocation.getCurrentPosition((position)=> {
         setPosition({lat: position.coords.latitude, lng: position.coords.longitude, time: new Date()})
@@ -66,6 +49,37 @@ const NearestStations = () => {
     })
   },[])
 
+  const getUserPosition = () => {
+    let parkingSpot=null;
+    // navigator.geolocation.getCurrentPosition((position)=> {
+      parkingSpot = {lat: position.lat, lng: position.lng, time: new Date(), label: allStations[selected].label}
+      
+      setSpot(parkingSpot);
+    
+      console.log("p: ", parkingSpot)
+      
+    // })
+  //   let returnValue = parkingSpot;
+  //   return  returnValue
+  //   setSpot("fjopjp")
+  }
+
+  async function getTime_Dis(location) {
+    console.log("kfopkaf: ", position, location)
+    // eslint-disable-next-line no-undef
+    const directionsService = new google.maps.DirectionsService()
+      const results = await directionsService.route({
+          origin: position,
+          destination: location,
+          // eslint-disable-next-line no-undef
+          travelMode: google.maps.TravelMode.BICYCLING,
+      })
+    // setTime_Dis()
+    let dis = results.routes[0].legs[0].distance.text;
+    let dur = results.routes[0].legs[0].duration.text
+    console.log("dis: ", dis, dur)
+    setTime_Dis({dis: dis, dur: dur})
+  } 
 
   const handleGetAllStations = async() => {
     const {
@@ -82,7 +96,6 @@ const NearestStations = () => {
     return Math.sqrt((location.lat-origin.lat)*111.2*111.2*(location.lat-origin.lat) + (location.lng-origin.lng)*110.8*110.8*(location.lng-origin.lng))
   }
 
-  var time_dis = {dur: 0, dis: 0}
   const calculateRoute = (idx) => {
     console.log("hihi: ", idx, allStations[idx].label)
     setDefaultLocation(allStations[idx].location)
@@ -95,6 +108,49 @@ const NearestStations = () => {
   },[position])
 
     return (<>
+    <Box sx={{ width: '50%', position:"fixed", left: "50%", top:"12%", transform: "translate(-50%, 0)" }}>
+      { errorMessage? <Collapse in={errorMessage}>
+                <Alert severity='error'
+                action={
+                    <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                        // setErrorOpen(false);
+                        setErrorMessage("");
+                    }}
+                    >
+                    <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                }
+                sx={{ mb: 2 }}
+                >
+                {errorMessage}
+                </Alert>
+            </Collapse> : <></>}
+            
+            {successMessage? <Collapse in={successMessage}>
+                <Alert severity='success'
+                action={
+                    <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                        // setSuccessOpen(false);
+                        setSuccessMessage("");
+                    }}
+                    >
+                    <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                }
+                sx={{ mb: 2 }}
+                >
+                {successMessage}
+                </Alert>
+            </Collapse> : <></>}
+            </Box>
         <Typography gutterBottom variant="h4" component="div" marginLeft="12px">
             Nearest Stations
         </Typography>
@@ -103,7 +159,7 @@ const NearestStations = () => {
             {allStations.map((stop, index) => 
             <>
             <ListItem alignItems="flex-start" justifyitems='center' key={stop.label} sx={{height: '130px'}} >
-                <ListItemAvatar sx={{height: '80px', width: '100px'}} onClick={()=>{setScroll2(true); setSelected(index)}}>
+                <ListItemAvatar sx={{height: '80px', width: '100px'}} onClick={()=>{ setTime_Dis(getTime_Dis(allStations[index].location)); setScroll2(true); setSelected(index); }}>
                     <Avatar alt="Remy Sharp" src={stop.src} sx={{height: '80px', width: '80px'}}/>
                     {/* {EE2_Building_Southside} */}
                 </ListItemAvatar>
@@ -129,7 +185,6 @@ const NearestStations = () => {
                 />
             </ListItem>
             <Divider variant="inset" component="li" key= {`${stop.label} divider`} />
-            <Modal open={true} scroll={scroll2} setScroll={setScroll2} data={allStations[selected]} calculateRoute={()=>calculateRoute(selected)} time_dis={time_dis} setOpenParking={setOpenParking} mode={2}></Modal>
                     </>
              )}
       {/* <ListItem alignItems="flex-start" sx={{height: '80px'}}>
@@ -155,6 +210,8 @@ const NearestStations = () => {
       </ListItem>
       <Divider variant="inset" component="li" /> */}
     </List>
+    <Modal open={true} scroll={scroll2} setScroll={setScroll2} data={allStations[selected]} calculateRoute={()=>calculateRoute(selected)} time_dis={time_dis} setOpenParking={setOpenParking} mode={2}></Modal>
+    {openParking? <ParkInModal openParking={openParking} setOpenParking={setOpenParking} getUserPosition={getUserPosition} spot={spot} setErrorMessage={setErrorMessage} setSuccessMessage={setSuccessMessage}></ParkInModal> : null}
     </>
     )
 }
